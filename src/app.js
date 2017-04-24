@@ -8,6 +8,7 @@ import {StyleSheet, Text} from "react-native";
 
 let cPrimary = "#009688";
 
+
 export default class App extends React.Component {
     renderTitle = (props) => {
         return (
@@ -16,6 +17,7 @@ export default class App extends React.Component {
     }
     render () {
         return (
+
             <Router>
                 <Scene key="root">
                     <Scene

@@ -7,7 +7,7 @@ import {
     StyleSheet,
     ListView,
     TouchableOpacity,
-    ScrollView
+    ScrollView, StatusBar
 } from 'react-native';
 
 import {
@@ -20,6 +20,7 @@ import {
 import Hr from 'react-native-hr'
 
 import * as firebase from 'firebase'
+let cPrimaryDark = "#00796B";
 
 const config = {
     apiKey: "AIzaSyCXN_bQJkP-mh3bBDw3RWVBd4_35nspTCk",
@@ -29,13 +30,15 @@ const config = {
     storageBucket: "alltvquotes.appspot.com",
     messagingSenderId: "688621988579"
 };
+
 firebase.initializeApp(config);
+
 export default class IndexComponent extends React.Component {
     constructor(props) {
         super(props);
         let titleAdapter = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
         let seasonAdapter = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-        let quoteAdapter = new ListView.DataSource({rowHasChanged: (r1, r2) => r1!== r2});
+        let quoteAdapter = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
         this.state = {
             name: props.name,
             titleDataSource: titleAdapter.cloneWithRows([]),
@@ -55,6 +58,10 @@ export default class IndexComponent extends React.Component {
     render() {
         return (
             <View style={styles.container}>
+
+                <StatusBar
+                    backgroundColor={cPrimaryDark}
+                />
                 <ScrollView>
                     <Text style={styles.heading}>Titles</Text>
                     <ListView horizontal={true} dataSource={this.state.titleDataSource}
@@ -68,6 +75,7 @@ export default class IndexComponent extends React.Component {
             </View>
         );
     }
+
     listenForItems(ref) {
         ref.on("value", (snapshot) => {
             snapshot.forEach((child) => {
@@ -142,19 +150,19 @@ export default class IndexComponent extends React.Component {
             seasonPosition: i
         });
         this.newRef.child(this.state.seasonArray[i].key).child("Quotes").on('value', (snapshot) => {
-                snapshot.forEach((child) => {
-                    this.state.quoteArray.push({
-                        quote: child.val().QuoteText,
-                        author: child.val().Author
-                    });
+            snapshot.forEach((child) => {
+                this.state.quoteArray.push({
+                    quote: child.val().QuoteText,
+                    author: child.val().Author
                 });
+            });
         });
         this.setState({
             quoteDataSource: this.state.quoteDataSource.cloneWithRows(this.state.quoteArray)
         })
     }
 
-    renderQuotes (rowData, sectionId, position) {
+    renderQuotes(rowData, sectionId, position) {
         return (
             <View style={styles.quoteContainer}>
                 <Text style={styles.quoteText}>{rowData.quote}</Text>
@@ -180,7 +188,7 @@ var styles = StyleSheet.create({
         backgroundColor: "#ebebeb",
         paddingTop: 60
     },
-    heading:{
+    heading: {
         marginLeft: 5,
         fontSize: 25,
         color: 'black'
