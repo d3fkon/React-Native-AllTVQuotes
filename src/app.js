@@ -3,6 +3,7 @@
  */
 import React from 'react';
 import IndexComponent from 'Ex9_1/src/components/index';
+import PlayerComponent from 'Ex9_1/src/components/player';
 import {Router, Scene} from 'react-native-router-flux';
 import {StyleSheet, Text} from "react-native";
 
@@ -29,6 +30,14 @@ export default class App extends React.Component {
                         // leftButtonIconStyle={{tintColor: "white"}}
                         renderBackButton={this.renderTitle.bind(this)}
                     />
+                    <Scene
+                        key="page2"
+                        component={PlayerComponent}
+                        navigationBarStyle={styles.navbar}
+                        leftTitle="Quote"
+                        // letTitle={this.props.title}
+                        renderBackButton={this.renderTitle.bind(this)}
+                    />
                 </Scene>
             </Router>
         )
@@ -40,12 +49,13 @@ var styles = StyleSheet.create({
         backgroundColor: cPrimary,
         flexDirection: 'row',
         justifyContent: 'flex-start',
-        elevation: 4,
+        elevation: 4
     },
     navTitle: {
         fontSize: 20,
         fontWeight:"bold",
         color: "white",
+        marginLeft: 10
     }
 })
 

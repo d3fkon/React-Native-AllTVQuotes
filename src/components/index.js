@@ -17,9 +17,10 @@ import {
     Image,
 } from 'react-native';
 
-import Hr from 'react-native-hr'
+import Hr from 'react-native-hr';
+import {Actions} from 'react-native-router-flux';
 
-import * as firebase from 'firebase'
+import * as firebase from 'firebase';
 let cPrimaryDark = "#00796B";
 
 const config = {
@@ -53,6 +54,7 @@ export default class IndexComponent extends React.Component {
         }
         this.ref = firebase.database().refFromURL('https://alltvquotes.firebaseio.com/');
         this.newRef = this.ref;
+        this.ref.onDisconnect();
     }
 
     render() {
@@ -70,7 +72,7 @@ export default class IndexComponent extends React.Component {
                     <ListView horizontal={true} dataSource={this.state.seasonDataSource}
                               renderRow={this.renderSeasons.bind(this)}/>
                     <Text style={styles.heading}>Quotes</Text>
-                    <ListView dataSource={this.state.quoteDataSource} renderRow={this.renderQuotes.bind(this)}/>
+                    <ListView dataSource={this.state.quoteDataSource} renderRow={this.renderQuotes.bind(this)} />
                 </ScrollView>
             </View>
         );
@@ -97,8 +99,9 @@ export default class IndexComponent extends React.Component {
                 this.onTitlePress(position);
             }}>
                 <View style={styles.listViewContainer}>
-                    <Image source={{uri: rowData.url}} style={styles.listImage}/>
-                    <Text style={styles.listText}>{rowData.title}</Text>
+                    <Image source={{uri: rowData.url}} style={styles.listImage}>
+                        <Text style={styles.listText}>{rowData.title}</Text>
+                    </Image>
                 </View>
             </TouchableOpacity>
 
@@ -135,8 +138,9 @@ export default class IndexComponent extends React.Component {
                 this.onSeasonPress(position);
             }}>
                 <View style={styles.listViewContainer}>
-                    <Image source={{uri: this.state.titleImgUrl}} style={styles.listImage}/>
-                    <Text style={styles.listText}>{rowData.title}</Text>
+                    <Image source={{uri: this.state.titleImgUrl}} style={styles.listImage}>
+                        <Text style={styles.listText}>{rowData.title}</Text>
+                    </Image>
                     {/*<Text style={styles.listText}>{this.state.seasonArray[0].key}</Text>*/}
                 </View>
             </TouchableOpacity>
@@ -153,25 +157,38 @@ export default class IndexComponent extends React.Component {
             snapshot.forEach((child) => {
                 this.state.quoteArray.push({
                     quote: child.val().QuoteText,
-                    author: child.val().Author
+                    author: child.val().Author,
+                    playerUrl: child.val().QuotePlayerUrl
                 });
             });
         });
         this.setState({
+            quoteArray: this.state.quoteArray,
             quoteDataSource: this.state.quoteDataSource.cloneWithRows(this.state.quoteArray)
         })
     }
 
     renderQuotes(rowData, sectionId, position) {
         return (
+        <TouchableOpacity
+            onPress={() => {this.onQuotePress(position);}}
+        >
             <View style={styles.quoteContainer}>
                 <Text style={styles.quoteText}>{rowData.quote}</Text>
                 <Hr lineColor={'#ebebeb'}/>
                 <Text style={styles.quoteAuthor}>{rowData.author}</Text>
             </View>
+        </TouchableOpacity>
+
         )
     }
 
+    onQuotePress(i) {
+        Actions.page2({
+            titleName: this.state.titleArray[this.state.titlePosition].title,
+            url: this.state.quoteArray[i].playerUrl
+        })
+    }
     componentDidMount() {
         this.listenForItems(this.ref)
     }
@@ -209,13 +226,18 @@ var styles = StyleSheet.create({
         padding: 10
     },
     listText: {
+        color: "#fff",
         fontSize: 18,
         textAlign: "center",
         margin: 5,
+        position: 'absolute',
+        bottom: 10,
+        left: 0
     },
     listImage: {
         height: 120,
-        width: 213.33
+        width: 213.33,
+        borderRadius: 5
     },
     quoteText: {
         marginTop: 5,
